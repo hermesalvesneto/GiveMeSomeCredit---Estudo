@@ -44,9 +44,7 @@ Essa comparação permite analisar o trade-off entre simplicidade, interpretabil
 
 ## Resultados
 
-O projeto compara abordagens interpretaveis e automatizadas para modelagem de risco de credito, usando AUC e acuracia como metricas de avaliacao em validacao. 
-
-O modelo usando apenas as duas variáveis selecionadas a partir da EDA teve uma boa AUC e acurácia em comparação com os demais métodos de seleção de variáveis. 
+O projeto compara abordagens para modelagem de risco de credito, usando AUC e acuracia como metricas de avaliacao em validacao. 
 
 Os modelos foram avaliados utilizando AUC (ROC-AUC) e acurácia.
 
