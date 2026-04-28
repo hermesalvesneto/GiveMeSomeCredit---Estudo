@@ -37,7 +37,7 @@ Essa comparação permite analisar o trade-off entre simplicidade, interpretabil
 
 ## Arquivos principais
 
-- `modelo_de_regressao_para_score_credito.ipynb`
+- `GiveMeSomeCredit.ipynb`
  Analise preditiva com modelo de regressão logistica e comparacao entre estrategias de selecao de variaveis. 
 
 
