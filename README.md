@@ -37,8 +37,9 @@ Essa comparação permite analisar o trade-off entre simplicidade, interpretabil
 
 ## Arquivos principais
 
-- `versao1_com_comparacao.ipynb`  
-  Analise preditiva com modelo de regressão logistica e comparacao entre estrategias de selecao de variaveis.
+- `modelo_de_regressao_para_score_credito.ipynb`
+ Analise preditiva com modelo de regressão logistica e comparacao entre estrategias de selecao de variaveis. 
+
 
 
 ## Resultados
