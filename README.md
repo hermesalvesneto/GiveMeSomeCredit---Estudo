@@ -1,13 +1,16 @@
 # Give Me Some Credit - Estudo de Risco de Credito
 
-Este repositorio apresenta um estudo em Python sobre modelagem de risco de credito a partir do dataset **Give Me Some Credit**.  
-O foco do projeto e mostrar um fluxo inicial de analise de dados aplicado a credito, incluindo tratamento de dados, exploracao, engenharia de variaveis, modelagem estatística e comparacao de estrategias de selecao de variaveis.
+Meu objetivo é comparar métodos de regressão logística com diferentes formas de selecionar variáveis. 
 
-## Objetivo
+Primeiro, faço uma breve análise do conjunto de dados com o tratamento de dados faltantes e um processo de engenharia de features nas variáveis que guardam o números atrasos de pagamento em um determinado prazo fixo. Como essas variáveis de atraso estão altamente correlacionadas, isso pode ser um problema para o modelo. Para evitar isso, agrupamos essas informações em uma única variável chamada `late_score` que faz uma soma ponderada dos atrasos em cada período. Além disso, nessa análise exploratória verificamos que o conjunto de dados disponível para treino é desbalanceado. Apenas cerca de $7\%$ dos dados correspondem a pessoas classificadas como más pagadoras. Se não modelado corretamente, isso pode levar a ajuste que classifica a maioria dos dados como bons pagadores ($y=0$). Para isso vamos procurar nos orientar usando a curva ROC para escolher um limiar que tenha um balanceamento entre **sensibilidade** e **especificidade**.
 
-Construir um modelo de risco de crédito para estimar a probabilidade de inadimplencia (`default_2y`), explorando modelos interpretaveis e comparando diferentes formas de selecionar variaveis.
+Feito essa primeira análise exploratória, vamos aos métodos de seleção de variáveis. A primeira forma de selecionar será baseada nos gráficos de boxplot comparando as distribuiçoes de cada variáveis explicativa pelas preditoras. Uma variável que indica uma forte depedência é a variável `late_score`. A variável `credit_utilization` também evidencia uma dependência, mas ao rodar o modelo de regressão logística do pacote `statsmodels` vemos que a partir do teste de hipóteses que a função `sm.GLM` apresenta, temos evidências para não rejeitar a hipótese de que essa variável possui significância estatística para o modelo. Por isso, vamos analisar o desempenho da variável `late_score` sozinha. As outras formas de seleção de variáveis são o AIC, o BIC e a regularização L1 Lasso.
 
-O foco é explorar cenários e equilibrar performance preditiva e interpretabilidade.
+Na avaliação de desempenho dos modelos de regressão logística usando a função logito como função de ligação, podemos observar que quando consideramos um limiar padrão de $0.5$, a sensibilidade dos modelos fica próxima de $0$, o que é muito ruim para avaliar risco de crédito, afinal, não queremos um modelo que tenha uma baixa taxa de acerto nos maus pagadores pois isso implica em conceder crédito a pessoas que não conseguirão pagar. Isso acontece porque os dados estão desbalanceados. Para contornar isso, fiz uma rotina para impõe um limite inferior para a sensibilidade e a partir disso busca por limiares que melhorem a **acurácia** do teste.
+
+Os modelos com limiares otimizados confirmam a suposição de que os melhores limiares estão mais próximos do zero e o resultado foi satisfatório. Surpreendentemente, o modelo que leva em consideração apenas a variável `late_score` apresentou um ótimo resultado.
+
+Para futuras análises, quero fazer análises de resíduos para veficar se o modelo precisa de algum ajuste e gráficos QQ plot para verificar se as suposições sobre o modelo estão corretas. Além disso gostaria de comparar a regressão logística logito com outros modelos.
 
 ## Principais etapas do projeto
 
@@ -19,53 +22,14 @@ O foco é explorar cenários e equilibrar performance preditiva e interpretabili
 - ajuste de modelos de regressao logistica;
 - comparacao entre:
   - selecao manual de variaveis;
-  - stepwise AIC;
+  - AIC e BIC;
   - regularizacao L1;
 - geracao de previsoes para o conjunto de teste.
 
-## Modelagem
-
-Foi utilizada regressão logística, amplamente empregada em crédito por sua interpretabilidade e capacidade de estimar probabilidades.
-
-O projeto compara três abordagens de seleção de variáveis:
-
-Manual (EDA): seleção baseada em análise exploratória e entendimento do problema;
-Stepwise (AIC): abordagem automatizada baseada em critério de informação;
-Regularização L1: seleção automática via penalização.
-
-Essa comparação permite analisar o trade-off entre simplicidade, interpretabilidade e performance.
-
 ## Arquivos principais
 
-- `GiveMeSomeCredit.ipynb`
- Analise preditiva com modelo de regressão logistica e comparacao entre estrategias de selecao de variaveis. 
+- `GiveMeSomeCredit-Copy3.ipynb`
 
-
-
-## Resultados
-
-O projeto compara abordagens para modelagem de risco de credito, usando AUC e acuracia como metricas de avaliacao em validacao. 
-
-Os modelos foram avaliados utilizando AUC (ROC-AUC) e acurácia.
-
-O modelo mais simples, com apenas duas variáveis selecionadas a partir da análise exploratória, apresentou desempenho competitivo em relação aos modelos mais complexos.
-Isso indica que variáveis bem escolhidas podem capturar grande parte do risco de crédito, mesmo com menor complexidade.
-
-
-abordagem	modelo	      n_variaveis	auc_treino	auc_validacao	acuracia_validacao
-  L1	  Logistic Regression	 10	          0.790	           0.799	        0.761
- Manual	       GLM Logit	  2	          0.713	           0.717	        0.933
-Stepwise AIC   GLM Logit	  8	          0.656	           0.669	        0.933
-
-Observa-se que o modelo com regularização L1 apresentou melhor desempenho em termos de AUC, indicando maior capacidade de discriminar bons e maus pagadores.
-
-Já os modelos mais simples apresentaram alta acurácia, possivelmente influenciada pelo desbalanceamento da base, o que reforça a importância do uso de AUC como métrica principal em problemas de crédito.
-
-Apesar da menor acurácia em relação aos modelos mais simples, o modelo com regularização L1 apresentou maior AUC, indicando melhor capacidade de discriminação entre bons e maus pagadores.
-
-Em problemas de crédito, métricas como AUC são mais adequadas do que acurácia, especialmente em bases desbalanceadas, pois capturam melhor a capacidade do modelo de prever o risco dos clientes.
-
-Dessa forma, o modelo com regularização L1 se mostra mais adequado para construção de um score de crédito.
 
 ## Ferramentas utilizadas
 
@@ -77,20 +41,9 @@ Dessa forma, o modelo com regularização L1 se mostra mais adequado para constr
 - statsmodels
 - scikit-learn
 
-## Como executar
-
-1. Clone este repositorio.
-2. Instale as bibliotecas necessarias em um ambiente Python.
-3. Garanta que os arquivos do dataset estejam disponiveis na pasta `GiveMeSomeCredit/`.
-4. Abra um dos notebooks no Jupyter Notebook ou JupyterLab.
-
 ## Dataset
 
 O estudo foi feito sobre o dataset **Give Me Some Credit**, amplamente usado em problemas de classificacao em credito.
-
-## Motivacao
-
-Este projeto foi desenvolvido com o objetivo de consolidar conhecimentos em análise de dados aplicada a risco de crédito, com foco na construção de modelos interpretáveis.
 
 ## Autor
 
